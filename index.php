@@ -1,3 +1,12 @@
+<?php session_start(); 
+    $conn = mysqli_connect("localhost", "root", "", "todoapp");
+    if(!$conn) {
+        echo "connect error" . mysqli_connect_error($conn);
+    }
+
+    $sql = "SELECT * FROM `task`";
+    $result = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +26,23 @@
     <div class="container">
         <div class="row">
             <div class="col-8 mx-auto">
-                <form action="#" method="POST" class="form border p-2 my-5">
+                <form action="handelers/task.php" method="POST" class="form border p-2 my-5">
+                    <?php if(isset($_SESSION['success'])) { ?>
+                        <div class="alert alert-success text-center">
+                            <?php 
+                                echo $_SESSION['success']; 
+                                unset($_SESSION['success']);
+                            ?>
+                        </div>
+                    <?php } ?>
+                    <?php if(isset($_SESSION['error'])) { ?>
+                        <div class="alert alert-danger text-center">
+                            <?php 
+                                echo $_SESSION['error']; 
+                                unset($_SESSION['error']);
+                            ?>
+                        </div>
+                    <?php } ?>
                     <input type="text" name="title" class="form-control my-3 border border-success" placeholder="add new todo">
                     <input type="submit" value="Add" class="form-control btn btn-primary my-3 " placeholder="add new todo">
                 </form>
@@ -32,15 +57,16 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php while($row = mysqli_fetch_assoc($result)): ?>
                             <tr>
-                                <td>1</td>
-                                <td>New Task</td>
+                                <td><?php echo $row["id"]?></td>
+                                <td><?php echo $row["title"]?></td>
                                 <td>
-                                    <a href="#" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> </a>
-                                    <a href="#" class="btn btn-info"><i class="fa-solid fa-edit"></i> </a>
+                                    <a href="handelers/delete-task.php?id=<?php echo $row['id'] ?>" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> </a>
+                                    <a href="update.php?id=<?php echo $row['id'] ?>" class="btn btn-info"><i class="fa-solid fa-edit"></i> </a>
                                 </td>
                             </tr>
-
+                            <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
